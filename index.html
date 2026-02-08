@@ -233,12 +233,28 @@
             const reverseConfig = currencyConfig[config.reversePair];
 
             // 1. 最初の両替で受け取る金額
-            const receivedAmount = amount * (1 - config.feeRate) * rate;
+            let receivedAmount;
+            if (config.toCurrency === 'JPY') {
+                // CAD→JPY: 掛け算
+                receivedAmount = amount * (1 - config.feeRate) * rate;
+            } else {
+                // JPY→CAD: 割り算
+                receivedAmount = (amount * (1 - config.feeRate)) / rate;
+            }
 
             // 2. 元の金額に戻すために必要な逆レート
-            // 逆両替時: receivedAmount × (1 - 逆手数料) ÷ レート = amount
-            // つまり: レート = receivedAmount × (1 - 逆手数料) ÷ amount
-            const breakEvenRate = (receivedAmount * (1 - reverseConfig.feeRate)) / amount;
+            let breakEvenRate;
+            if (reverseConfig.toCurrency === 'JPY') {
+                // CAD→JPY（戻す時）: JPY ÷ レート = CAD
+                // receivedAmount(CAD) × (1 - 手数料) × レート = amount(JPY)
+                // レート = amount ÷ (receivedAmount × (1 - 手数料))
+                breakEvenRate = amount / (receivedAmount * (1 - reverseConfig.feeRate));
+            } else {
+                // JPY→CAD（戻す時）: CAD × レート = JPY
+                // receivedAmount(JPY) × (1 - 手数料) ÷ レート = amount(CAD)
+                // レート = receivedAmount × (1 - 手数料) ÷ amount
+                breakEvenRate = (receivedAmount * (1 - reverseConfig.feeRate)) / amount;
+            }
 
             // 結果を表示
             displayResult(breakEvenRate, config, reverseConfig, amount, receivedAmount);
