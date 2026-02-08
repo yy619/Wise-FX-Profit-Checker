@@ -1,65 +1,71 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wise FX Profit Checker</title>
-<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
 <div class="container">
 <h1>Wise FX Profit Checker</h1>
 
 <div class="card">
 <h2>通貨設定</h2>
-
 <label>元通貨</label>
 <select id="baseCurrency">
-<option>JPY</option>
 <option>CAD</option>
+<option>JPY</option>
 <option>HKD</option>
 </select>
 
 <label>変換先通貨</label>
 <select id="targetCurrency">
-<option>CAD</option>
 <option>JPY</option>
+<option>CAD</option>
 <option>HKD</option>
 </select>
 </div>
 
 <div class="card">
-<h2>初回両替</h2>
+<h2>両替情報</h2>
+<label>両替額</label>
+<input type="number" id="amount" placeholder="例: 100">
 
-<label>投資金額</label>
-<input id="baseAmount" type="number" />
+<label>合計手数料</label>
+<input type="number" id="fee" placeholder="例: 0.46">
 
-<label>両替時レート</label>
-<input id="initialRate" type="number" step="0.01" />
+<label>受領額</label>
+<input type="number" id="received" placeholder="例: 11444">
 
-<label>手数料 (%)</label>
-<input id="feePercent" type="number" step="0.01" value="0.6" />
+<label>為替レート</label>
+<input type="number" id="rate" placeholder="例: 114.967">
 </div>
 
 <div class="card">
-<h2>現在レート</h2>
-
-<label>現在レート</label>
-<input id="currentRate" type="number" step="0.01" />
+<button id="calcBtn">計算する</button>
 </div>
 
-<div class="card result">
+<div class="card">
 <h2>計算結果</h2>
-
-<p>保有通貨量: <span id="foreignAmount">-</span></p>
-<p>現在価値: <span id="currentValue">-</span></p>
-<p>損益: <span id="profit">-</span></p>
-<p>損益分岐レート: <span id="breakEven">-</span></p>
-
+<div class="result-grid">
+<div>
+<h3>保有通貨量</h3>
+<p id="foreignAmount">-</p>
 </div>
-
+<div>
+<h3>現在価値</h3>
+<p id="currentValue">-</p>
+</div>
+<div>
+<h3>損益</h3>
+<p id="profit">-</p>
+</div>
+<div>
+<h3>損益分岐</h3>
+<p id="breakEven">-</p>
+</div>
+</div>
 </div>
 
 <script src="script.js"></script>
