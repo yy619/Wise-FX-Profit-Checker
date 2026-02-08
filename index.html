@@ -12,9 +12,7 @@
 <!-- 通貨ペア選択 -->
 <div>
   <label for="pairSelect">通貨ペア:</label>
-  <select id="pairSelect">
-    <!-- JSで自動生成 -->
-  </select>
+  <select id="pairSelect"></select>
 </div>
 
 <!-- Entryセクション -->
@@ -25,13 +23,6 @@
   <label>為替レート: <input type="number" id="entryRate" step="0.0001"></label>
 </div>
 
-<!-- Exitセクション -->
-<div id="exitSection" class="card">
-  <h2>Exit（戻す場合）</h2>
-  <label>現在レート: <input type="number" id="exitRate" step="0.0001"></label><br>
-  <label>合計手数料: <input type="number" id="exitFee" step="0.01"></label>
-</div>
-
 <!-- 計算ボタン -->
 <button id="calcBtn">計算する</button>
 
@@ -39,10 +30,8 @@
 <div id="resultSection" class="card">
   <h2>計算結果</h2>
   <p id="receivedAmount"></p>
-  <p id="exitNet"></p>
-  <p id="profit"></p>
-  <p id="profitRate"></p>
   <p id="breakEvenRate"></p>
+  <p id="calcAmount"></p>
 </div>
 
 <script src="script.js"></script>
