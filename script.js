@@ -1,17 +1,8 @@
-// JSONを直接JS内に書く
-let feeData = {
-  "CAD-JPY": { 
-    "base":"CAD", 
-    "quote":"JPY",
-    "feeRate": 0.0046   // 両替額に対する割合
-  },
-  "JPY-CAD": { 
-    "base":"JPY", 
-    "quote":"CAD",
-    "feeRate": 0.0063
-  }
+// 通貨ペアを直接JSに書く
+const feeData = {
+  "CAD-JPY": { base: "CAD", quote: "JPY" },
+  "JPY-CAD": { base: "JPY", quote: "CAD" }
 };
-
 
 // 通貨ペア選択肢生成
 function populatePairs() {
@@ -27,10 +18,11 @@ function populatePairs() {
 // 計算ロジック
 function calculate() {
   const pair = document.getElementById("pairSelect").value;
-
   const entryAmount = parseFloat(document.getElementById("entryAmount").value);
   const entryFee = parseFloat(document.getElementById("entryFee").value);
   const entryRate = parseFloat(document.getElementById("entryRate").value);
+
+  if (isNaN(entryAmount) || isNaN(entryFee) || isNaN(entryRate)) return;
 
   const receivedAmount = (entryAmount - entryFee) * entryRate;
   const breakEvenRate = entryAmount / receivedAmount;
@@ -44,7 +36,6 @@ function calculate() {
     `計算額: ${calcAmount.toFixed(2)} (${receivedAmount.toFixed(2)} × ${breakEvenRate.toFixed(4)})`;
 }
 
-// ボタンイベント
 document.getElementById("calcBtn").addEventListener("click", calculate);
 
 // 初期化
