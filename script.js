@@ -1,49 +1,35 @@
-const inputs = document.querySelectorAll("input, select");
-
-inputs.forEach(el => {
-el.addEventListener("input", calculate);
-});
+document.getElementById("calcBtn").addEventListener("click", calculate);
 
 function calculate() {
+  const amount = Number(document.getElementById("amount").value);
+  const fee = Number(document.getElementById("fee").value);
+  const received = Number(document.getElementById("received").value);
+  const rate = Number(document.getElementById("rate").value);
 
-const baseAmount = Number(document.getElementById("baseAmount").value);
-const initialRate = Number(document.getElementById("initialRate").value);
-const currentRate = Number(document.getElementById("currentRate").value);
-const feePercent = Number(document.getElementById("feePercent").value);
+  if (!amount || !received || !rate) return;
 
-if (!baseAmount || !initialRate || !currentRate) return;
+  // 保有通貨量 = 受領額 / 為替レート
+  const foreignAmount = received / rate;
 
-const feeRate = feePercent / 100;
+  // 現在価値 = 受領額（今は為替レートで戻す想定）
+  const currentValue = foreignAmount * rate;
 
-// 円 → 外貨
-const netAmount = baseAmount * (1 - feeRate);
-const foreignAmount = netAmount / initialRate;
+  // 損益 = 現在価値 - (両替額 + 手数料)
+  const profit = currentValue - (amount + fee);
 
-// 外貨 → 円
-const currentValue = foreignAmount * currentRate * (1 - feeRate);
+  // 損益分岐レート = (両替額 + 手数料) / foreignAmount
+  const breakEven = (amount + fee) / foreignAmount;
 
-// 損益
-const profit = currentValue - baseAmount;
-
-// 損益分岐
-const breakEven = baseAmount / (foreignAmount * (1 - feeRate));
-
-updateUI(foreignAmount, currentValue, profit, breakEven);
+  updateUI(foreignAmount, currentValue, profit, breakEven);
 }
 
 function updateUI(foreignAmount, currentValue, profit, breakEven) {
+  document.getElementById("foreignAmount").textContent = foreignAmount.toFixed(2);
+  document.getElementById("currentValue").textContent = currentValue.toFixed(2);
 
-document.getElementById("foreignAmount").textContent =
-foreignAmount.toFixed(2);
+  const profitEl = document.getElementById("profit");
+  profitEl.textContent = profit.toFixed(2);
+  profitEl.className = profit >= 0 ? "profit" : "loss";
 
-document.getElementById("currentValue").textContent =
-currentValue.toFixed(2);
-
-const profitEl = document.getElementById("profit");
-profitEl.textContent = profit.toFixed(2);
-
-profitEl.className = profit >= 0 ? "profit" : "loss";
-
-document.getElementById("breakEven").textContent =
-breakEven.toFixed(2);
+  document.getElementById("breakEven").textContent = breakEven.toFixed(2);
 }
