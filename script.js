@@ -1,8 +1,17 @@
 // JSONを直接JS内に書く
 let feeData = {
-  "CAD-JPY": { "base":"CAD", "quote":"JPY" },
-  "JPY-CAD": { "base":"JPY", "quote":"CAD" }
+  "CAD-JPY": { 
+    "base":"CAD", 
+    "quote":"JPY",
+    "feeRate": 0.0046   // 両替額に対する割合
+  },
+  "JPY-CAD": { 
+    "base":"JPY", 
+    "quote":"CAD",
+    "feeRate": 0.0063
+  }
 };
+
 
 // 通貨ペア選択肢生成
 function populatePairs() {
