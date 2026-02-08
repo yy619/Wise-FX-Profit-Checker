@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wise 為替損益計算ツール</title>
+    <title>Wise Currency Break-Even Calculator</title>
     <style>
         * {
             margin: 0;
@@ -147,45 +147,190 @@
             color: #999;
             margin-top: 5px;
         }
+
+        .language-switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .lang-btn.active {
+            background: white;
+            color: #667eea;
+            border-color: white;
+        }
     </style>
 </head>
 <body>
+    <div class="language-switch">
+        <button class="lang-btn active" data-lang="en">English</button>
+        <button class="lang-btn" data-lang="ja">日本語</button>
+    </div>
+
     <div class="container">
-        <h1>💱 Wise 為替損益計算</h1>
-        <p class="subtitle">利益が出るレートを計算します</p>
+        <h1 data-i18n="title">💱 Wise Break-Even Calculator</h1>
+        <p class="subtitle" data-i18n="subtitle">Calculate the break-even exchange rate</p>
 
         <form id="calculatorForm">
             <div class="form-group">
-                <label for="currencyPair">通貨ペア</label>
+                <label for="currencyPair" data-i18n="currencyPairLabel">Currency Pair</label>
                 <select id="currencyPair" required>
-                    <option value="">選択してください</option>
-                    <option value="CAD-JPY">CAD → JPY (カナダドル → 日本円)</option>
-                    <option value="JPY-CAD">JPY → CAD (日本円 → カナダドル)</option>
+                    <option value="" data-i18n="selectOption">Select...</option>
+                    <option value="CAD-JPY">CAD → JPY (Canadian Dollar → Japanese Yen)</option>
+                    <option value="JPY-CAD">JPY → CAD (Japanese Yen → Canadian Dollar)</option>
                 </select>
                 <div class="fee-info" id="feeInfo"></div>
             </div>
 
             <div class="form-group">
-                <label for="amount">両替額</label>
-                <input type="number" id="amount" step="0.01" min="0" required placeholder="例: 100">
+                <label for="amount" data-i18n="amountLabel">Amount</label>
+                <input type="number" id="amount" step="0.01" min="0" required placeholder="e.g., 100">
             </div>
 
             <div class="form-group">
-                <label for="rate">為替レート</label>
-                <input type="number" id="rate" step="0.001" min="0" required placeholder="例: 114.967">
+                <label for="rate" data-i18n="rateLabel">Exchange Rate</label>
+                <input type="number" id="rate" step="0.001" min="0" required placeholder="e.g., 114.967">
             </div>
 
-            <button type="submit" class="calculate-btn">計算する</button>
+            <button type="submit" class="calculate-btn" data-i18n="calculateBtn">Calculate</button>
         </form>
 
         <div class="result" id="result">
-            <div class="result-label">利益が出るレート（逆両替時）</div>
+            <div class="result-label" data-i18n="resultLabel">Break-Even Rate (Reverse Exchange)</div>
             <div class="result-value" id="resultValue">-</div>
             <div class="result-description" id="resultDescription"></div>
         </div>
     </div>
 
     <script>
+        // 翻訳データ
+        const translations = {
+            en: {
+                title: "💱 Wise Break-Even Calculator",
+                subtitle: "Calculate the break-even exchange rate",
+                currencyPairLabel: "Currency Pair",
+                selectOption: "Select...",
+                amountLabel: "Amount",
+                rateLabel: "Exchange Rate",
+                calculateBtn: "Calculate",
+                resultLabel: "Break-Even Rate (Reverse Exchange)",
+                feeText: "Fee: ",
+                explanationTitle: "Explanation:",
+                exchangeTo: "Exchange to",
+                whenReversing: "When reversing this",
+                to: "to",
+                ifRateIs: "if the rate is",
+                orLess: "or less,",
+                noLoss: "you won't lose money after paying the fee",
+                cadJpyOption: "CAD → JPY (Canadian Dollar → Japanese Yen)",
+                jpyCadOption: "JPY → CAD (Japanese Yen → Canadian Dollar)",
+                amountPlaceholder: "e.g., 100",
+                ratePlaceholder: "e.g., 114.967"
+            },
+            ja: {
+                title: "💱 Wise 為替損益計算",
+                subtitle: "利益が出るレートを計算します",
+                currencyPairLabel: "通貨ペア",
+                selectOption: "選択してください",
+                amountLabel: "両替額",
+                rateLabel: "為替レート",
+                calculateBtn: "計算する",
+                resultLabel: "利益が出るレート（逆両替時）",
+                feeText: "手数料: ",
+                explanationTitle: "計算結果の説明:",
+                exchangeTo: "",
+                whenReversing: "この",
+                to: "を",
+                ifRateIs: "に戻す際、レートが",
+                orLess: "以下であれば、",
+                noLoss: "手数料を引いても元本割れしません。",
+                cadJpyOption: "CAD → JPY (カナダドル → 日本円)",
+                jpyCadOption: "JPY → CAD (日本円 → カナダドル)",
+                amountPlaceholder: "例: 100",
+                ratePlaceholder: "例: 114.967"
+            }
+        };
+
+        // 現在の言語（デフォルト: 英語）
+        let currentLang = localStorage.getItem('language') || 'en';
+
+        // ページ読み込み時に言語を適用
+        document.addEventListener('DOMContentLoaded', function() {
+            applyLanguage(currentLang);
+            updateActiveButton(currentLang);
+        });
+
+        // 言語切り替えボタン
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const lang = this.dataset.lang;
+                currentLang = lang;
+                localStorage.setItem('language', lang);
+                applyLanguage(lang);
+                updateActiveButton(lang);
+            });
+        });
+
+        function updateActiveButton(lang) {
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
+            });
+        }
+
+        function applyLanguage(lang) {
+            const t = translations[lang];
+            
+            // data-i18n属性を持つ要素を更新
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.dataset.i18n;
+                if (t[key]) {
+                    el.textContent = t[key];
+                }
+            });
+
+            // セレクトボックスのオプション
+            const currencySelect = document.getElementById('currencyPair');
+            currencySelect.options[0].text = t.selectOption;
+            currencySelect.options[1].text = t.cadJpyOption;
+            currencySelect.options[2].text = t.jpyCadOption;
+
+            // プレースホルダー
+            document.getElementById('amount').placeholder = t.amountPlaceholder;
+            document.getElementById('rate').placeholder = t.ratePlaceholder;
+
+            // 手数料情報も更新
+            const pair = currencySelect.value;
+            if (pair && currencyConfig[pair]) {
+                updateFeeInfo(pair, lang);
+            }
+        }
+
+        function updateFeeInfo(pair, lang) {
+            const t = translations[lang];
+            const feeInfo = document.getElementById('feeInfo');
+            const config = currencyConfig[pair];
+            const feePercent = (config.feeRate * 100).toFixed(2);
+            feeInfo.textContent = `${t.feeText}${feePercent}%`;
+        }
+
         // 通貨ペア設定（手数料率を含む）
         const currencyConfig = {
             "CAD-JPY": {
@@ -204,15 +349,12 @@
 
         // 通貨ペア選択時に手数料情報を表示
         document.getElementById('currencyPair').addEventListener('change', function(e) {
-            const feeInfo = document.getElementById('feeInfo');
             const pair = e.target.value;
             
             if (pair && currencyConfig[pair]) {
-                const config = currencyConfig[pair];
-                const feePercent = (config.feeRate * 100).toFixed(2);
-                feeInfo.textContent = `手数料: ${feePercent}%`;
+                updateFeeInfo(pair, currentLang);
             } else {
-                feeInfo.textContent = '';
+                document.getElementById('feeInfo').textContent = '';
             }
         });
 
@@ -225,7 +367,10 @@
             const rate = parseFloat(document.getElementById('rate').value);
 
             if (!pair || !amount || !rate) {
-                alert('すべての項目を入力してください');
+                const errorMsg = currentLang === 'en' 
+                    ? 'Please fill in all fields' 
+                    : 'すべての項目を入力してください';
+                alert(errorMsg);
                 return;
             }
 
@@ -264,6 +409,7 @@
             const resultDiv = document.getElementById('result');
             const resultValue = document.getElementById('resultValue');
             const resultDescription = document.getElementById('resultDescription');
+            const t = translations[currentLang];
 
             resultValue.textContent = breakEvenRate.toFixed(3);
 
@@ -271,13 +417,24 @@
             const toCurrency = config.toCurrency;
             const reverseFeePercent = (reverseConfig.feeRate * 100).toFixed(2);
 
-            let description = `
-                <strong>計算結果の説明:</strong><br>
-                ${originalAmount.toFixed(2)} ${fromCurrency} → ${receivedAmount.toFixed(2)} ${toCurrency} に両替<br><br>
-                この ${toCurrency} を ${fromCurrency} に戻す際、<br>
-                レートが <strong>${breakEvenRate.toFixed(3)}</strong> 以下であれば、<br>
-                手数料(${reverseFeePercent}%)を引いても元本割れしません。
-            `;
+            let description;
+            if (currentLang === 'en') {
+                description = `
+                    <strong>${t.explanationTitle}</strong><br>
+                    ${originalAmount.toFixed(2)} ${fromCurrency} → ${receivedAmount.toFixed(2)} ${toCurrency}<br><br>
+                    When reversing this ${toCurrency} to ${fromCurrency},<br>
+                    if the rate is <strong>${breakEvenRate.toFixed(3)}</strong> or less,<br>
+                    you won't lose money after paying the ${reverseFeePercent}% fee.
+                `;
+            } else {
+                description = `
+                    <strong>${t.explanationTitle}</strong><br>
+                    ${originalAmount.toFixed(2)} ${fromCurrency} → ${receivedAmount.toFixed(2)} ${toCurrency} に両替<br><br>
+                    この ${toCurrency} を ${fromCurrency} に戻す際、<br>
+                    レートが <strong>${breakEvenRate.toFixed(3)}</strong> 以下であれば、<br>
+                    手数料(${reverseFeePercent}%)を引いても元本割れしません。
+                `;
+            }
 
             resultDescription.innerHTML = description;
             resultDiv.classList.add('show');
