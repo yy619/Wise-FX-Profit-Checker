@@ -4,6 +4,7 @@ let feeData = {};
 async function loadFees() {
   const res = await fetch("fees.json");
   feeData = await res.json();
+  console.log("feeData:", feeData)
   populatePairs();
 }
 
