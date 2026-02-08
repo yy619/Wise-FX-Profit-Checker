@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wise FX Profit Checker</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+<div class="container">
+<h1>Wise FX Profit Checker</h1>
+
+<div class="card">
+<h2>通貨設定</h2>
+
+<label>元通貨</label>
+<select id="baseCurrency">
+<option>JPY</option>
+<option>CAD</option>
+<option>HKD</option>
+</select>
+
+<label>変換先通貨</label>
+<select id="targetCurrency">
+<option>CAD</option>
+<option>JPY</option>
+<option>HKD</option>
+</select>
+</div>
+
+<div class="card">
+<h2>初回両替</h2>
+
+<label>投資金額</label>
+<input id="baseAmount" type="number" />
+
+<label>両替時レート</label>
+<input id="initialRate" type="number" step="0.01" />
+
+<label>手数料 (%)</label>
+<input id="feePercent" type="number" step="0.01" value="0.6" />
+</div>
+
+<div class="card">
+<h2>現在レート</h2>
+
+<label>現在レート</label>
+<input id="currentRate" type="number" step="0.01" />
+</div>
+
+<div class="card result">
+<h2>計算結果</h2>
+
+<p>保有通貨量: <span id="foreignAmount">-</span></p>
+<p>現在価値: <span id="currentValue">-</span></p>
+<p>損益: <span id="profit">-</span></p>
+<p>損益分岐レート: <span id="breakEven">-</span></p>
+
+</div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

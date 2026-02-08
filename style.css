@@ -1,0 +1,47 @@
+body {
+font-family: system-ui, sans-serif;
+background: #f5f6f8;
+margin: 0;
+padding: 20px;
+}
+
+.container {
+max-width: 600px;
+margin: auto;
+}
+
+h1 {
+text-align: center;
+}
+
+.card {
+background: white;
+padding: 20px;
+margin-top: 20px;
+border-radius: 8px;
+box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+label {
+display: block;
+margin-top: 10px;
+font-weight: bold;
+}
+
+input, select {
+width: 100%;
+padding: 8px;
+margin-top: 4px;
+}
+
+.result span {
+font-weight: bold;
+}
+
+.profit {
+color: green;
+}
+
+.loss {
+color: red;
+}
