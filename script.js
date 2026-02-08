@@ -1,12 +1,8 @@
-let feeData = {};
-
-// JSON読み込み
-async function loadFees() {
-  const res = await fetch("fees.json");
-  feeData = await res.json();
-  console.log("feeData:", feeData);
-  populatePairs();
-}
+// JSONを直接JS内に書く
+let feeData = {
+  "CAD-JPY": { "base":"CAD", "quote":"JPY" },
+  "JPY-CAD": { "base":"JPY", "quote":"CAD" }
+};
 
 // 通貨ペア選択肢生成
 function populatePairs() {
@@ -27,28 +23,20 @@ function calculate() {
   const entryFee = parseFloat(document.getElementById("entryFee").value);
   const entryRate = parseFloat(document.getElementById("entryRate").value);
 
-  // 1. Entry受領額
   const receivedAmount = (entryAmount - entryFee) * entryRate;
-
-  // 2. 利益が出るレート（ブレークイーブン）
   const breakEvenRate = entryAmount / receivedAmount;
-
-  // 3. 計算額（手数料を引いた額）と式
   const calcAmount = receivedAmount * breakEvenRate;
 
-  // 結果表示
   document.getElementById("receivedAmount").textContent =
     `Entry受領額: ${receivedAmount.toFixed(2)} ${feeData[pair].quote}`;
-
   document.getElementById("breakEvenRate").textContent =
     `利益が出るレート: ${breakEvenRate.toFixed(4)} ${feeData[pair].quote}/${feeData[pair].base}`;
-
   document.getElementById("calcAmount").textContent =
     `計算額: ${calcAmount.toFixed(2)} (${receivedAmount.toFixed(2)} × ${breakEvenRate.toFixed(4)})`;
 }
 
-// イベント
+// ボタンイベント
 document.getElementById("calcBtn").addEventListener("click", calculate);
 
 // 初期化
-loadFees();
+populatePairs();
