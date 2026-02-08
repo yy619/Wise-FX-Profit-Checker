@@ -4,7 +4,7 @@ let feeData = {};
 async function loadFees() {
   const res = await fetch("fees.json");
   feeData = await res.json();
-  console.log("feeData:", feeData)
+  console.log("feeData:", feeData);
   populatePairs();
 }
 
@@ -27,30 +27,24 @@ function calculate() {
   const entryFee = parseFloat(document.getElementById("entryFee").value);
   const entryRate = parseFloat(document.getElementById("entryRate").value);
 
-  const exitRate = parseFloat(document.getElementById("exitRate").value);
-  const exitFee = parseFloat(document.getElementById("exitFee").value);
-
-  // Entry受領額
+  // 1. Entry受領額
   const receivedAmount = (entryAmount - entryFee) * entryRate;
 
-  // Exit後金額
-  const exitNet = (receivedAmount / exitRate) - exitFee;
+  // 2. 利益が出るレート（ブレークイーブン）
+  const breakEvenRate = entryAmount / receivedAmount;
 
-  // 損益
-  const profit = exitNet - entryAmount;
-
-  // 損益率
-  const profitRate = (profit / entryAmount) * 100;
-
-  // ブレークイーブンレート
-  const breakEvenRate = receivedAmount / (entryAmount + exitFee);
+  // 3. 計算額（手数料を引いた額）と式
+  const calcAmount = receivedAmount * breakEvenRate;
 
   // 結果表示
-  document.getElementById("receivedAmount").textContent = `Entry受領額: ${receivedAmount.toFixed(2)} ${feeData[pair].quote}`;
-  document.getElementById("exitNet").textContent = `現在戻せる金額: ${exitNet.toFixed(2)} ${feeData[pair].base}`;
-  document.getElementById("profit").textContent = `損益: ${profit.toFixed(2)} ${feeData[pair].base}`;
-  document.getElementById("profitRate").textContent = `損益率: ${profitRate.toFixed(2)} %`;
-  document.getElementById("breakEvenRate").textContent = `損益分岐レート: ${breakEvenRate.toFixed(4)} ${feeData[pair].quote}`;
+  document.getElementById("receivedAmount").textContent =
+    `Entry受領額: ${receivedAmount.toFixed(2)} ${feeData[pair].quote}`;
+
+  document.getElementById("breakEvenRate").textContent =
+    `利益が出るレート: ${breakEvenRate.toFixed(4)} ${feeData[pair].quote}/${feeData[pair].base}`;
+
+  document.getElementById("calcAmount").textContent =
+    `計算額: ${calcAmount.toFixed(2)} (${receivedAmount.toFixed(2)} × ${breakEvenRate.toFixed(4)})`;
 }
 
 // イベント
