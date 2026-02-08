@@ -1,35 +1,271 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>両替シミュレーター</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wise 為替損益計算ツール</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        input[type="number"] {
+            font-family: 'Courier New', monospace;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+        }
+
+        .result-description {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .fee-info {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>💱 Wise 為替損益計算</h1>
+        <p class="subtitle">利益が出るレートを計算します</p>
 
-<h1>両替戦略シミュレーター</h1>
+        <form id="calculatorForm">
+            <div class="form-group">
+                <label for="currencyPair">通貨ペア</label>
+                <select id="currencyPair" required>
+                    <option value="">選択してください</option>
+                    <option value="CAD-JPY">CAD → JPY (カナダドル → 日本円)</option>
+                    <option value="JPY-CAD">JPY → CAD (日本円 → カナダドル)</option>
+                </select>
+                <div class="fee-info" id="feeInfo"></div>
+            </div>
 
-<div>
-  <label for="pairSelect">通貨ペア:</label>
-  <select id="pairSelect"></select>
-</div>
+            <div class="form-group">
+                <label for="amount">両替額</label>
+                <input type="number" id="amount" step="0.01" min="0" required placeholder="例: 100">
+            </div>
 
-<div id="entrySection" class="card">
-  <h2>Entry（両替情報）</h2>
-  <label>両替額: <input type="number" id="entryAmount" step="0.01"></label><br>
-  <label>合計手数料: <input type="number" id="entryFee" step="0.01"></label><br>
-  <label>為替レート: <input type="number" id="entryRate" step="0.0001"></label>
-</div>
+            <div class="form-group">
+                <label for="rate">為替レート</label>
+                <input type="number" id="rate" step="0.001" min="0" required placeholder="例: 114.967">
+            </div>
 
-<button id="calcBtn">計算する</button>
+            <button type="submit" class="calculate-btn">計算する</button>
+        </form>
 
-<div id="resultSection" class="card">
-  <h2>計算結果</h2>
-  <p id="receivedAmount"></p>
-  <p id="breakEvenRate"></p>
-  <p id="calcAmount"></p>
-</div>
+        <div class="result" id="result">
+            <div class="result-label">利益が出るレート（逆両替時）</div>
+            <div class="result-value" id="resultValue">-</div>
+            <div class="result-description" id="resultDescription"></div>
+        </div>
+    </div>
 
-<script src="script.js"></script>
+    <script>
+        // 通貨ペア設定（手数料率を含む）
+        const currencyConfig = {
+            "CAD-JPY": {
+                fromCurrency: "CAD",
+                toCurrency: "JPY",
+                feeRate: 0.0045,
+                reversePair: "JPY-CAD"
+            },
+            "JPY-CAD": {
+                fromCurrency: "JPY",
+                toCurrency: "CAD",
+                feeRate: 0.0062,
+                reversePair: "CAD-JPY"
+            }
+        };
+
+        // 通貨ペア選択時に手数料情報を表示
+        document.getElementById('currencyPair').addEventListener('change', function(e) {
+            const feeInfo = document.getElementById('feeInfo');
+            const pair = e.target.value;
+            
+            if (pair && currencyConfig[pair]) {
+                const config = currencyConfig[pair];
+                const feePercent = (config.feeRate * 100).toFixed(2);
+                feeInfo.textContent = `手数料: ${feePercent}%`;
+            } else {
+                feeInfo.textContent = '';
+            }
+        });
+
+        // フォーム送信処理
+        document.getElementById('calculatorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const pair = document.getElementById('currencyPair').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const rate = parseFloat(document.getElementById('rate').value);
+
+            if (!pair || !amount || !rate) {
+                alert('すべての項目を入力してください');
+                return;
+            }
+
+            const config = currencyConfig[pair];
+            const reverseConfig = currencyConfig[config.reversePair];
+
+            // 1. 最初の両替で受け取る金額
+            const receivedAmount = amount * (1 - config.feeRate) * rate;
+
+            // 2. 元の金額に戻すために必要な逆レート
+            // 逆両替時: receivedAmount × (1 - 逆手数料) ÷ レート = amount
+            // つまり: レート = receivedAmount × (1 - 逆手数料) ÷ amount
+            const breakEvenRate = (receivedAmount * (1 - reverseConfig.feeRate)) / amount;
+
+            // 結果を表示
+            displayResult(breakEvenRate, config, reverseConfig, amount, receivedAmount);
+        });
+
+        function displayResult(breakEvenRate, config, reverseConfig, originalAmount, receivedAmount) {
+            const resultDiv = document.getElementById('result');
+            const resultValue = document.getElementById('resultValue');
+            const resultDescription = document.getElementById('resultDescription');
+
+            resultValue.textContent = breakEvenRate.toFixed(3);
+
+            const fromCurrency = config.fromCurrency;
+            const toCurrency = config.toCurrency;
+            const reverseFeePercent = (reverseConfig.feeRate * 100).toFixed(2);
+
+            let description = `
+                <strong>計算結果の説明:</strong><br>
+                ${originalAmount.toFixed(2)} ${fromCurrency} → ${receivedAmount.toFixed(2)} ${toCurrency} に両替<br><br>
+                この ${toCurrency} を ${fromCurrency} に戻す際、<br>
+                レートが <strong>${breakEvenRate.toFixed(3)}</strong> 以下であれば、<br>
+                手数料(${reverseFeePercent}%)を引いても元本割れしません。
+            `;
+
+            resultDescription.innerHTML = description;
+            resultDiv.classList.add('show');
+        }
+    </script>
 </body>
 </html>
